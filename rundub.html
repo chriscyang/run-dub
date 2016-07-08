@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title> RUN DUB </title>
+        <link href="rundub.css" type="text/css" rel="stylesheet" />
+
+        <link rel="shortcut icon" href="logo.png">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    </head>
+
+    <body>
+        <div class="overlay"></div>
+        <nav class="navbar navbar-default" style=" background-color: rgba(0,0,0,0.0);border:none;">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <div class="navbar-left"><a href="/"><img src="logo.png" alt="RUN DUB" style="max-width:180px;max-height:180px;" /></a></div>
+                </div>
+                <div class="nav navbar-nav navbar-right" style="margin-top:25px;margin-right:10px;">
+                    <div class="btn-group">
+                        <div class="btn btn-default navbar-btn" style="width:80px;background-color:white;"><a href="#">Sign Up</a></div>
+                        <div class="btn btn-default navbar-btn" style="width:80px;background-color:white;"><a href="#">Sign In</a></div>
+                        <div class="btn btn-default navbar-btn" style="width:80px;background-color:white;"><a href="#">Profile</a></div>
+                </div>
+            </div>
+        </nav>
+
+        <div style="margin-top:;" class="container">
+            <div id="first" class="col-md-6 col-md-offset-3">
+                <h1>
+                    WHERE ARE YOU?
+                    <input style="display: none" class="form-control" id="userLoc"></input>
+                    <div style="margin-bottom: 150px" class="btn btn-default loc">Enter Location</div>
+<!--                     <div style="margin-bottom: 150px" class="btn btn-default loc">Use My Location</div> -->
+                </h1>
+            </div>
+
+            <div id="second" class="col-md-8 col-md-offset-2" style="display: none;">
+                <h1>
+                    WHAT'S YOUR RUN RADIUS (M)?
+                    <input class="form-control" id="userRad" type="number"></input>
+                    <div style="margin-bottom: 150px" class="btn btn-default loc">Get Moving</div>
+                </h1>
+            </div>
+
+            <div id="third" class="col-md-8 col-md-offset-2" style="display: none;">
+                <h1 id="changeThis">
+                    <span>HERE'S YOU</span>
+                    <div id="map" style="height:400px;width:800px;"></div>
+                    <div style="margin-bottom: 150px;" class="btn btn-default loc" id="newRoute">Give Me Something</div>
+                </h1>
+
+            </div>
+        </div>
+    </body>
+</html>
+
+<script>
+var userLoc;
+var userRad;
+
+var lat = null;
+var lng = null;
+
+var loc;
+var rad;
+
+var map;
+
+$(document).ready(function() {
+    $(".loc").on("click", function() {
+        $("#userLoc").toggle("fast");
+    });
+
+    // First page
+    $("#userLoc").keypress(function(e) {
+        if (e.which == 13) {
+            if ($("#userLoc").val()) {
+                userLoc = $("#userLoc").val();
+
+                geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ "address": userLoc }, function(results,status){
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        lat = results[0].geometry.location.lat();
+                        lng = results[0].geometry.location.lng();
+                    }
+                })
+
+                $("#first").toggle("fast", function() {
+                    $("body").css("background", "url(SF_bg.png)").css("background-color", "#FDC689");
+                    $(".overlay").css("background-color", "#FDC689");
+                    $("#second").toggle("fast");
+                });
+            } else {
+                alert("Please enter a location!");
+            }
+        }
+    });
+
+    // Second page
+    $("#userRad").keypress(function(e) {
+        if (e.which == 13) {
+            if ($("#userRad").val()) {
+                userRad = $("#userRad").val();
+
+                $("#second").toggle("fast", function() {
+                    $("body").css("background", "url(route_bg.png)").css("background-color", "#6DCFF6");
+                    $(".overlay").css("background-color", "#6DCFF6");
+                    $("#third").toggle("fast");
+                    initMap();
+                    gimmeARoute();
+                });
+            } else {
+                alert("Please enter a radius!");
+            }
+        }
+    });
+
+    $("#newRoute").on("click", function() {
+        $("#changeThis").find("span").html("AND HERE'S YOUR ROUTE");
+        $("#changeThis").find("#newRoute").html("Give me something fresh");
+        initMap();
+        gimmeARoute();
+    });
+});
+
+// Make the map
+function initMap() {
+    loc = new google.maps.LatLng(lat, lng);
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: loc,
+        zoom: 14,
+        mapTypeControl: false,
+        streetViewControl: false,
+    });
+    infoWindow = new google.maps.InfoWindow();
+}
+
+var nearbys = [];
+
+function generateNearbys(k) {
+    var service = new google.maps.places.PlacesService(map);
+
+    var request = {
+        location: loc,
+        radius: userRad / 2,
+        keyword: k
+    };
+
+    service.nearbySearch(request, callback);
+}
+
+function callback(results, status) {
+    var _lat, _lng;
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+        for (var i = 0; i < results.length; i++) {
+            nearbys.push(results[i]);
+        }
+    }
+}
+
+function generateAllNearbys(){
+    generateNearbys("restaurant");
+    generateNearbys("coffee");
+    generateNearbys("bus");
+    generateNearbys("school");
+}
+
+var pts;
+
+function gimmeARoute() {
+    generateAllNearbys();
+    chooseRandomPts();
+
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplay.setMap(map);
+    calculateAndDisplayRoute(directionsService, directionsDisplay);
+}
+
+function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+      var waypts = [];
+
+      for (var i = 0; i < pts.length; i++) {
+        if (pts[i]) {
+            waypts.push({
+                location: pts[i].geometry.location,
+                stopover: true
+            });
+        }
+      }
+
+      directionsService.route({
+        origin: loc,
+        destination: loc,
+        waypoints: waypts,
+        optimizeWaypoints: true,
+        travelMode: google.maps.TravelMode.WALKING
+      }, cb);
+
+      function cb(response, status) {
+        if (status === google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(response);
+          var route = response.routes[0];
+        } else {
+          window.alert('Directions request failed due to ' + status);
+        }
+      }
+}
+function chooseRandomPts() {
+    pts = [];
+    var temp;
+    temp = Math.floor((Math.random() * 80));
+    pts.push(nearbys[temp]);
+    console.log(temp);
+    console.log("nearbys[temp]: " + nearbys[temp]);
+    console.log(pts);
+
+    temp = Math.floor((Math.random() * 80));
+    pts.push(nearbys[temp]);
+    console.log(temp);
+    console.log("nearbys[temp]: " + nearbys[temp]);
+    console.log(pts);
+
+    temp = Math.floor((Math.random() * 80));
+    pts.push(nearbys[temp]);
+    console.log(temp);
+    console.log("nearbys[temp]: " + nearbys[temp]);
+    console.log(pts);
+
+    temp = Math.floor((Math.random() * 80));
+    pts.push(nearbys[temp]);
+    console.log(temp);
+    console.log("nearbys[temp]: " + nearbys[temp]);
+    console.log(pts);
+}
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDttMI7oQkU7f4oSj9TJxHnK4RMDETzhRI&libraries=places"></script>
