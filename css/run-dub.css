@@ -3,35 +3,37 @@
 /* -------------------------------------------------------------------------- */
 
 body {
-    margin: 0px;
     display: compact;
     overflow: hidden;
 
-    background-color: #7ACCC8;
+    margin: 0;
+
     background: url(../img/bg_sea.png);
-    background-size: 100%;
+    background-color: #7accc8;
     background-repeat: no-repeat;
+    background-size: 100%;
 }
 
 #overlay {
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
     position: absolute;
     z-index: -1;
+    top: 0;
+    left: 0;
 
-    background-color: #7ACCC8;
-    opacity: 0.78;
+    width: 100%;
+    height: 100%;
+
+    opacity: .78;
+    background-color: #7accc8;
 }
 
 /* -------------------------------------------------------------------------- */
-/* TOP
+/* NAVBAR
 /* -------------------------------------------------------------------------- */
 
 .navbar {
-    background-color: rgba(0, 0, 0, 0.0);
     border: none;
+    background-color: rgba(0, 0, 0, .0);
 }
 
 #logo {
@@ -46,6 +48,7 @@ body {
 
 .user-btn {
     width: 80px;
+
     background-color: white;
 }
 
@@ -53,7 +56,7 @@ a,
 a:hover,
 a:active,
 a:visited {
-    color: #7ACCC8;
+    color: #7accc8;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -66,13 +69,15 @@ a:visited {
 }
 
 span {
-    width: 100%;
-    margin: 0px;
-    text-align: center;
-
     font-family: Helvetica, sans-serif;
     font-size: 32px;
+
+    width: 100%;
+    margin: 0;
+
+    text-align: center;
     letter-spacing: 5px;
+
     color: white;
 }
 
@@ -82,15 +87,17 @@ span {
 
 .form-actions {
     margin-top: 10px;
+
     text-align: center;
 }
 
 .user-input {
     width: 200px;
     margin: auto;
+
     text-align: center;
 
-    color: #7ACCC8;
+    color: #7accc8;
 }
 
 #map {

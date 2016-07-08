@@ -1,81 +1,96 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <title>Run DUB</title>
-        <link rel="stylesheet" href="css/bootstrap.min.css" />
-        <link rel="stylesheet" href="css/run-dub.css" />
-        <link rel="shortcut icon" href="img/icon.png" />
-        <script src="js/jquery.min.js"></script>
-        <script src="js/run-dub.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDttMI7oQkU7f4oSj9TJxHnK4RMDETzhRI&libraries=places"></script>
-    </head>
 
-    <body>
+<head>
 
-        <!-- COLOUR OVERLAY -->
-        <div id="overlay"></div>
+    <!-- META -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
-        <!-- NAVBAR -->
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <div class="navbar-left">
-                        <a id="logo-link"><img id="logo" src="img/logo.png" alt="Run DUB" /></a>
-                    </div>
+    <!-- TITLE -->
+    <title>Run DUB</title>
+
+    <!-- ICON -->
+    <link rel="shortcut icon" href="img/icon.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/run-dub.css">
+
+</head>
+
+<body>
+
+    <!-- COLOUR OVERLAY -->
+    <div id="overlay"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <div class="navbar-left">
+                    <a id="logo-link"><img id="logo" alt="Run DUB" src="img/logo.png" /></a>
                 </div>
-                <div id="user-menu" class="nav navbar-nav navbar-right">
-                    <div class="btn-group">
-                        <div class="btn btn-default navbar-btn user-btn"><a href="#">Sign Up</a></div>
-                        <div class="btn btn-default navbar-btn user-btn"><a href="#">Sign In</a></div>
-                    </div>
-                </div>
             </div>
-        </nav>
-
-        <!-- MAIN -->
-        <div class="container">
-
-            <!-- PAGE 1: LOCATION -->
-            <div id="pg-location" class="col-md-8 col-md-offset-2">
-                <span class="col-sm-12">WHERE ARE YOU?</span>
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <input type="text" id="user-loc" class="form-control" />
-                    </div>
-                    <div class="form-actions">
-                        <div id="enter-loc" class="btn btn-default user-btn user-input"><a href="#">Enter Location</a></div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- PAGE 2: RADIUS -->
-            <div id="pg-radius" class="col-md-8 col-md-offset-2">
-                <span class="col-md-12">WHAT'S YOUR RUN RADIUS (M)?</span>
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <input type="text" id="user-rad" class="form-control" />
-                    </div>
-                    <div class="form-actions">
-                        <div id="lets-move" class="btn btn-default user-btn user-input"><a href="#">Let's Get Moving</a></div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- PAGE 3: ROUTE -->
-            <div id="pg-route"class="col-md-8 col-md-offset-2">
-                <span class="col-md-12">HERE'S YOU</span>
-                <div id="map"></div>
-                <div class="form-actions">
-                    <div id="new-route" class="btn btn-default user-btn user-input"><a href="#">Give Me Something</a></div>
+            <div id="user-menu" class="nav navbar-nav navbar-right">
+                <div class="btn-group">
+                    <div class="btn btn-default navbar-btn user-btn"><a href="#">Sign Up</a></div>
+                    <div class="btn btn-default navbar-btn user-btn"><a href="#">Sign In</a></div>
                 </div>
             </div>
         </div>
+    </nav>
 
-        <!-- FOOTER -->
-        <nav class="navbar navbar-default navbar-fixed-bottom">
-            <div class="container-fluid">
+    <!-- MAIN -->
+    <div class="container">
+
+        <!-- PAGE 1: LOCATION -->
+        <div id="pg-location" class="col-md-8 col-md-offset-2">
+            <span class="col-sm-12">WHERE ARE YOU?</span>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <input type="text" id="user-loc" class="form-control" />
+                </div>
+                <div class="form-actions">
+                    <div id="enter-loc" class="btn btn-default user-btn user-input"><a href="#">Enter Location</a></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- PAGE 2: RADIUS -->
+        <div id="pg-radius" class="col-md-8 col-md-offset-2">
+            <span class="col-md-12">WHAT'S YOUR RUN RADIUS (M)?</span>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <input type="text" id="user-rad" class="form-control" />
+                </div>
+                <div class="form-actions">
+                    <div id="lets-move" class="btn btn-default user-btn user-input"><a href="#">Let's Get Moving</a></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- PAGE 3: ROUTE -->
+        <div id="pg-route" class="col-md-8 col-md-offset-2">
+            <span class="col-md-12">HERE'S YOU</span>
+            <div id="map"></div>
+            <div class="form-actions">
+                <div id="new-route" class="btn btn-default user-btn user-input"><a href="#">Give Me Something</a></div>
             </div>
-        </nav>
-    </body>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container-fluid"></div>
+    </nav>
+
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDttMI7oQkU7f4oSj9TJxHnK4RMDETzhRI&libraries=places"></script>
+    <script src="js/run-dub.js"></script>
+
+</body>
+
 </html>
