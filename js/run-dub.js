@@ -27,11 +27,7 @@ $(document).ready(function() {
     /* PAGE 1: LOCATION
     /* -----------------------------------------------------------------------*/
 
-    // Show location input on button click.
-    $("#enter-loc").on("click", function() {
-        $("#user-loc").toggle("fast")
-                      .focus();
-    });
+    $("input[type='text']").focus();
 
     // Submit location and transition to page 2 on enter.
     $("#user-loc").keypress(function(e) {
