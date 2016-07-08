@@ -93,10 +93,6 @@ span {
     color: #7ACCC8;
 }
 
-#user-loc {
-    display: none;
-}
-
 #map {
     width: 600px;
     height: 400px;
