@@ -42,6 +42,11 @@ $(document).ready(function() {
         }
     });
 
+    $("#enter-loc").on("click", function() {
+        var e = $.Event("keypress", { which: 13 });
+        $("#user-loc").trigger(e);
+    });
+
     function submitLocation() {
 
         // Collect the lat and lng values.
