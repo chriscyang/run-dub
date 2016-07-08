@@ -29,36 +29,42 @@ $(document).ready(function() {
 
     // Show location input on button click.
     $("#enter-loc").on("click", function() {
-        $("#user-loc").toggle("fast");
+        $("#user-loc").toggle("fast")
+                      .focus();
     });
 
     // Submit location and transition to page 2 on enter.
     $("#user-loc").keypress(function(e) {
         if (e.which == 13) {
             if ($(this).val()) {
-
-                // Collect the lat and lng values.
                 loc = $(this).val();
-                var gc = new google.maps.Geocoder();
-                gc.geocode({ "address": loc }, function(results, status) {
-                    if (status === google.maps.GeocoderStatus.OK) {
-                        lat = results[0].geometry.location.lat();
-                        lng = results[0].geometry.location.lng();
-                    }
-                });
-
-                // Transition to page 2.
-                $("#pg-location").toggle("fast", function() {
-                    $("#overlay").css("background-color", "#FDC689");
-                    $("body").css("background-color", "#FDC689")
-                             .css("background", "url(img/bg_sfo.png)");
-                    $("#pg-radius").toggle("fast");
-                });
+                submitLocation();
             } else {
                 alert("Please enter a location!");
             }
         }
     });
+
+    function submitLocation() {
+
+        // Collect the lat and lng values.
+        var gc = new google.maps.Geocoder();
+        gc.geocode({ "address": loc }, function(results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+                lat = results[0].geometry.location.lat();
+                lng = results[0].geometry.location.lng();
+            }
+        });
+
+        // Transition to page 2.
+        $("#pg-location").toggle("fast", function() {
+            $("#overlay").css("background-color", "#FDC689");
+            $("body").css("background-color", "#FDC689")
+                     .css("background", "url(img/bg_sfo.png)");
+            $("#pg-radius").toggle("fast");
+            $("#user-rad").focus();
+        });
+    }
 
     /* -----------------------------------------------------------------------*/
     /* PAGE 2: RADIUS
@@ -68,24 +74,32 @@ $(document).ready(function() {
     $("#user-rad").keypress(function(e) {
         if (e.which == 13) {
             if ($(this).val()) {
-
-                // Collect the rad value.
                 rad = $(this).val();
-
-                // Transition to page 3.
-                $("#pg-radius").toggle("fast", function() {
-                    $("#overlay").css("background-color", "#6DCFF6");
-                    $("body").css("background-color", "#6DCFF6")
-                             .css("background", "url(img/bg_mtn.png)");
-                    $("#pg-route").toggle("fast");
-                    initMap();
-                    gimmeARoute();
-                });
+                submitRadius();
             } else {
                 alert("Please enter a radius!");
             }
         }
     });
+
+    // Submit radius and transition to page 3 on button click.
+    $("#lets-move").on("click", function() {
+        var e = $.Event("keypress", { which: 13 });
+        $("#user-rad").trigger(e);
+    });
+
+    function submitRadius() {
+
+        // Transition to page 3.
+        $("#pg-radius").toggle("fast", function() {
+            $("#overlay").css("background-color", "#6DCFF6");
+            $("body").css("background-color", "#6DCFF6")
+                     .css("background", "url(img/bg_mtn.png)");
+            $("#pg-route").toggle("fast");
+            initMap();
+            gimmeARoute();
+        });
+    }
 
     /* -----------------------------------------------------------------------*/
     /* PAGE 3: ROUTE
