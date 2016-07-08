@@ -42,6 +42,7 @@ $(document).ready(function() {
             } else {
                 alert("Please enter a location!");
             }
+            return false;
         }
     });
 
@@ -79,6 +80,7 @@ $(document).ready(function() {
             } else {
                 alert("Please enter a radius!");
             }
+            return false;
         }
     });
 
