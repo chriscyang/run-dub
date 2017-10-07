@@ -1,239 +1,340 @@
-// -----------------------------------------------------------------------------
-// VARIABLES
-// -----------------------------------------------------------------------------
+/* jshint -W117 */
 
-var PAGE2_COLOUR = "#fdc689";
-var PAGE3_COLOUR = "#6dcff6";
+const App = (() => {
+    let instance;
 
-var PAGE2_BACKGROUND = "url(img/bg_sfo.png)";
-var PAGE3_BACKGROUND = "url(img/bg_mtn.png)";
+    const create = () => {
+        const pvt = {
+            loc: null,
+            rad: null,
 
-var lat = null;
-var lng = null;
-var loc;
-var rad;
+            nearbys: [],
+            waypoints: [],
+        };
+        const pub = {};
 
-var map;
-var keywords = [
-    "restaurant",
-    "coffee",
-    "bus",
-    "school",
-];
-var nearbys = [];
-var randomPts;
+        // ---------------------------------------------------------------------
+        // ENUMS
+        // ---------------------------------------------------------------------
 
-// -----------------------------------------------------------------------------
-// INTERACTIVE ELEMENTS & PAGE TRANSITIONS
-// -----------------------------------------------------------------------------
-
-$(document).ready(function () {
-
-    // Reload page on logo click.
-    $("#logo-link").on("click", function () {
-        location.reload();
-    });
-
-    // Always focus on input fields.
-    $("input[type='text']").focus();
-
-    // -------------------------------------------------------------------------
-    // PAGE 1: LOCATION
-    // -------------------------------------------------------------------------
-
-    // Submit location on enter.
-    $("#user-loc").keypress(function (e) {
-        if (e.which === 13) {
-            if ($(this).val()) {
-                loc = $(this).val();
-                submitLocation();
-            } else {
-                alert("Please enter a location!");
-            }
-            return false;
-        }
-    });
-
-    // Submit location on button click.
-    $("#enter-loc").on("click", function () {
-        var e = $.Event("keypress", { which : 13, });
-        $("#user-loc").trigger(e);
-    });
-
-    /**
-     * Collects lat and lng of loc and transitions to Page 2.
-     */
-    function submitLocation() {
-        var gc = new google.maps.Geocoder();
-        gc.geocode({ "address" : loc }, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
-                lat = results[0].geometry.location.lat();
-                lng = results[0].geometry.location.lng();
-            }
+        pvt.Selector = Object.freeze({
+            PAGE: '.page',
+            TITLE: '.page-title',
+            INPUT: '.page-input',
+            SUBMIT: '.page-submit',
         });
 
-        $("#pg-location").toggle("fast", function () {
-            $("#overlay").css("background-color", PAGE2_COLOUR);
-            $("body").css("background-color", PAGE2_COLOUR)
-                     .css("background", PAGE2_BACKGROUND);
-            $("#pg-radius").toggle("fast");
-            $("#user-rad").focus();
+        pvt.Page = Object.freeze({
+            LOC: 'loc',
+            RAD: 'rad',
+            MAP: 'map',
         });
-    }
 
-    // -------------------------------------------------------------------------
-    // PAGE 2: RADIUS
-    // -------------------------------------------------------------------------
-
-    // Submit radius on enter.
-    $("#user-rad").keypress(function (e) {
-        if (e.which === 13) {
-            if ($(this).val()) {
-                rad = $(this).val();
-                submitRadius();
-            } else {
-                alert("Please enter a radius!");
-            }
-            return false;
-        }
-    });
-
-    // Submit radius on button click.
-    $("#lets-move").on("click", function () {
-        var e = $.Event("keypress", { which : 13, });
-        $("#user-rad").trigger(e);
-    });
-
-    /**
-     * Transitions to Page 3.
-     */
-    function submitRadius() {
-        $("#pg-radius").toggle("fast", function () {
-            $("#overlay").css("background-color", PAGE3_COLOUR);
-            $("body").css("background-color", PAGE3_COLOUR)
-                     .css("background", PAGE3_BACKGROUND);
-            $("#pg-route").toggle("fast");
-            initMap();
-            gimmeARoute();
+        pvt.Alert = Object.freeze({
+            LOC: 'Please enter a location!',
+            RAD: 'Please enter a radius!',
         });
-    }
 
-    // -------------------------------------------------------------------------
-    // PAGE 3: ROUTE
-    // -------------------------------------------------------------------------
+        pvt.Label = Object.freeze({
+            AND_HERES_YOUR_ROUTE: 'AND HERE\'S YOUR ROUTE',
+            GIVE_ME_SOMETHING_FRESH: 'Give Me Something Fresh',
+        });
 
-    // Generate route on button click.
-    $("#new-route").on("click", function () {
-        $("#pg-route").find("span").html("AND HERE'S YOUR ROUTE");
-        $("#pg-route").find("#new-route").find("a").html("Give me something fresh");
-        initMap();
-        gimmeARoute();
-    });
-});
+        pvt.KeyCode = Object.freeze({
+            ENTER: 13,
+        });
 
-// -----------------------------------------------------------------------------
-// MAP FUNCTIONS
-// -----------------------------------------------------------------------------
+        // ---------------------------------------------------------------------
+        // CONSTANTS
+        // ---------------------------------------------------------------------
 
-/**
- * Initializes the map based on user location.
- */
-function initMap() {
-    loc = new google.maps.LatLng(lat, lng);
-    map = new google.maps.Map(document.getElementById("map"), {
-        center            : loc,
-        zoom              : 14,
-        mapTypeControl    : false,
-        streetViewControl : false,
-    });
-    infoWindow = new google.maps.InfoWindow();
-}
+        pvt.THEMES = Object.freeze({
+            [pvt.Page.LOC]: Object.freeze({
+                color: '#7accc8',
+                image: 'url(img/seattle.png)',
+            }),
+            [pvt.Page.RAD]: Object.freeze({
+                color: '#fdc689',
+                image: 'url(img/san_francisco.png)',
+            }),
+            [pvt.Page.MAP]: Object.freeze({
+                color: '#6dcff6',
+                image: 'url(img/mountains.png)',
+            }),
+        });
 
-/**
- * Gets nearby places based on a keyword.
- */
-function generateNearbys(keyword) {
-    var service = new google.maps.places.PlacesService(map);
-    var request = {
-        location : loc,
-        radius   : rad / 2,
-        keyword  : keyword,
-    };
-    service.nearbySearch(request, callback);
+        pvt.KEYWORDS = Object.freeze([
+            'bus',
+            'coffee',
+            'restaurant',
+            'school',
+        ]);
 
-    function callback(results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            for (var i in results) {
-                nearbys.push(results[i]);
-            }
-        }
-    }
-}
+        // ---------------------------------------------------------------------
+        // INITIALIZATION
+        // ---------------------------------------------------------------------
 
-/**
- * Gets nearby places based on a set of keywords.
- */
-function generateAllNearbys() {
-    for (var i in keywords) {
-        generateNearbys(keywords[i]);
-    }
-}
+        pub.init = () => {
+            pvt.initElements();
+            pvt.initGMaps();
+            pvt.initPage();
+        };
 
-/**
- * Chooses random points from nearbys.
- */
-function chooseRandomPts() {
-    var randomIndex;
-    randomPts = [];
+        pvt.initElements = () => {
+            pvt.$body = $('body');
+            pvt.$logo = $('#logo');
+            pvt.$overlay = $('#overlay');
+            pvt.$map = $('#map');
+        };
 
-    randomIndex = Math.floor((Math.random() * 80));
-    randomPts.push(nearbys[randomIndex]);
+        pvt.initGMaps = () => {
+            pvt.geocoder = new google.maps.Geocoder();
+            pvt.directionsService = new google.maps.DirectionsService();
+            pvt.directionsRenderer = new google.maps.DirectionsRenderer();
+        };
 
-    randomIndex = Math.floor((Math.random() * 80));
-    randomPts.push(nearbys[randomIndex]);
+        pvt.initPage = () => {
+            pvt.goToPage(pvt.Page.LOC);
+        };
 
-    randomIndex = Math.floor((Math.random() * 80));
-    randomPts.push(nearbys[randomIndex]);
+        // ---------------------------------------------------------------------
+        // EVENT LISTENERS
+        // ---------------------------------------------------------------------
 
-    randomIndex = Math.floor((Math.random() * 80));
-    randomPts.push(nearbys[randomIndex]);
-}
+        pub.bind = () => {
+            pvt.bindLogo();
 
-/**
- * Puts a randomly generated route on the map.
- */
-function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-    var waypoints = [];
-    for (var i in randomPts) {
-        if (randomPts[i]) {
-            waypoints.push({
-                location : randomPts[i].geometry.location,
-                stopover : true,
+            pvt.bindLoc();
+            pvt.bindRad();
+            pvt.bindMap();
+        };
+
+        pvt.bindLogo = () => {
+            pvt.$logo.on('click', () => {
+                location.reload();
             });
+        };
+
+        pvt.bindLoc = () => {
+            const $page = pvt.getPage(pvt.Page.LOC);
+            const $input = $page.find(pvt.Selector.INPUT);
+            const $submit = $page.find(pvt.Selector.SUBMIT);
+
+            $input.on('keydown', (e) => {
+                if (e.which === pvt.KeyCode.ENTER) {
+                    pvt.submitLoc($input.val().trim());
+                }
+            });
+            $submit.on('click', () => {
+                pvt.submitLoc($input.val().trim());
+            });
+        };
+
+        pvt.bindRad = () => {
+            const $page = pvt.getPage(pvt.Page.RAD);
+            const $input = $page.find(pvt.Selector.INPUT);
+            const $submit = $page.find(pvt.Selector.SUBMIT);
+
+            $input.on('keydown', (e) => {
+                if (e.which === pvt.KeyCode.ENTER) {
+                    pvt.submitRad($input.val().trim());
+                }
+            });
+            $submit.on('click', () => {
+                pvt.submitRad($input.val().trim());
+            });
+        };
+
+        pvt.bindMap = () => {
+            const $page = pvt.getPage(pvt.Page.MAP);
+            const $title = $page.find(pvt.Selector.TITLE);
+            const $submit = $page.find(pvt.Selector.SUBMIT);
+            const submitMap = () => {
+                $title.text(pvt.Label.AND_HERES_YOUR_ROUTE);
+                $submit.text(pvt.Label.GIVE_ME_SOMETHING_FRESH);
+
+                pvt.genRoute();
+            };
+
+            pvt.$body.on('keydown', (e) => {
+                if (e.which === pvt.KeyCode.ENTER) {
+                    submitMap();
+                }
+            });
+            $submit.on('click', submitMap);
+        };
+
+        // ---------------------------------------------------------------------
+        // LOC
+        // ---------------------------------------------------------------------
+
+        pvt.submitLoc = (loc) => {
+            if (loc.length > 0) {
+                pvt.setLoc(loc);
+                pvt.goToPage(pvt.Page.RAD);
+            } else {
+                alert(pvt.Alert.LOC);
+            }
+        };
+
+        pvt.setLoc = (loc) => {
+            pvt.geocoder.geocode({ address: loc }, (results, status) => {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    const lat = results[0].geometry.location.lat();
+                    const lng = results[0].geometry.location.lng();
+
+                    pvt.loc = new google.maps.LatLng(lat, lng);
+                }
+            });
+        };
+
+        // ---------------------------------------------------------------------
+        // RAD
+        // ---------------------------------------------------------------------
+
+        pvt.submitRad = (rad) => {
+            if (rad > 0) {
+                pvt.setRad(rad);
+                pvt.initMap();
+                pvt.genRoute();
+
+                pvt.goToPage(pvt.Page.MAP);
+            } else {
+                alert(pvt.Alert.RAD);
+            }
+        };
+
+        pvt.setRad = (rad) => {
+            pvt.rad = rad;
+        };
+
+        // ---------------------------------------------------------------------
+        // MAP
+        // ---------------------------------------------------------------------
+
+        pvt.initMap = () => {
+            const options = {
+                center: pvt.loc,
+                zoom: 14,
+                mapTypeControl: false,
+                streetViewControl: false,
+            };
+
+            pvt.map = new google.maps.Map(pvt.$map[0], options);
+        };
+
+        pvt.genRoute = () => {
+            pvt.genNearbys();
+            pvt.genWaypoints();
+            pvt.genDirections();
+        };
+
+        pvt.genNearbys = () => {
+            pvt.KEYWORDS.forEach((keyword) => {
+                const service = new google.maps.places.PlacesService(pvt.map);
+                const request = {
+                    location: pvt.loc,
+                    radius: pvt.rad / 2,
+                    keyword: keyword,
+                };
+                const callback = (results, status) => {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        pvt.nearbys = pvt.nearbys.concat(results);
+                    }
+                };
+
+                service.nearbySearch(request, callback);
+            });
+        };
+
+        pvt.genWaypoints = () => {
+            pvt.waypoints = [];
+            for (let i = 0; i < 4; i += 1) {
+                const index = Math.floor(Math.random() * 80);
+                const nearby = pvt.nearbys[index];
+
+                if (nearby) {
+                    pvt.waypoints.push({
+                        location: nearby.geometry.location,
+                        stopover: true,
+                    });
+                }
+            }
+        };
+
+        pvt.genDirections = () => {
+            const options = {
+                origin: pvt.loc,
+                destination: pvt.loc,
+                waypoints: pvt.waypoints,
+                optimizeWaypoints: true,
+                travelMode: google.maps.TravelMode.WALKING,
+            };
+            const callback = (results, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    pvt.directionsRenderer.setDirections(results);
+                }
+            };
+
+            pvt.directionsRenderer.setMap(pvt.map);
+            pvt.directionsService.route(options, callback);
+        };
+
+        // ---------------------------------------------------------------------
+        // PAGES
+        // ---------------------------------------------------------------------
+
+        pvt.goToPage = (name) => {
+            const theme = pvt.THEMES[name];
+            const color = theme.color;
+            const image = theme.image;
+
+            const $pages = pvt.getPages();
+            const $page = pvt.getPage(name);
+            const $input = $page.find(pvt.Selector.INPUT);
+            const $submit = $page.find(pvt.Selector.SUBMIT);
+
+            pvt.$body.addClass('hidden');
+            $pages.addClass('hidden');
+
+            pvt.$overlay
+                .css('background-color', color);
+            pvt.$body
+                .css('background-color', color)
+                .css('background', image);
+
+            pvt.$body.removeClass('hidden');
+            $page.removeClass('hidden');
+            if ($input.length > 0) {
+                $input.focus();
+            } else {
+                $submit.focus();
+            }
+        };
+
+        pvt.getPages = () => {
+            return $(pvt.Selector.PAGE);
+        };
+
+        pvt.getPage = (name) => {
+            return pvt.getPages().filter(`[data-page=${name}]`);
+        };
+
+        return pub;
+    };
+
+    return {
+        getInstance: () => {
+            if (!instance) {
+                instance = create();
+            }
+
+            return instance;
         }
-    }
+    };
+})();
 
-    directionsService.route({
-        origin            : loc,
-        destination       : loc,
-        waypoints         : waypoints,
-        optimizeWaypoints : true,
-        travelMode        : google.maps.TravelMode.WALKING,
-    }, callback);
-
-    function callback(results, status) {
-        if (status === google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setDirections(results);
-        }
-    }
-}
-
-function gimmeARoute() {
-    generateAllNearbys();
-    chooseRandomPts();
-
-    var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer();
-    directionsDisplay.setMap(map);
-    calculateAndDisplayRoute(directionsService, directionsDisplay);
-}
+$(document).ready(() => {
+    App.getInstance().init();
+    App.getInstance().bind();
+});

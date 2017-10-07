@@ -1,17 +1,71 @@
 /* -------------------------------------------------------------------------- */
-/* BODY
+/* TYPOGRAPHY
+/* -------------------------------------------------------------------------- */
+
+* {
+    font-family: 'Raleway', sans-serif;
+}
+
+/* -------------------------------------------------------------------------- */
+/* THEME
+/* -------------------------------------------------------------------------- */
+
+.navbar {
+    border: none;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.form-control:focus {
+    border-color: #7accc8;
+}
+
+.btn-default {
+    width: 200px;
+    margin: auto;
+    background-color: white;
+}
+
+.btn-default,
+.btn-default:focus,
+.btn-default:hover,
+.btn-default:active,
+.btn-default:hover,
+.btn-default:active:focus,
+.btn-default:active:hover {
+    color: #7accc8;
+}
+
+.btn-default:focus,
+.btn-default:active:focus,
+.btn-default:active:hover {
+    outline-color: #7accc8;
+}
+
+/* -------------------------------------------------------------------------- */
+/* LAYOUT
 /* -------------------------------------------------------------------------- */
 
 body {
-    display: compact;
     overflow: hidden;
-
     margin: 0;
-
-    background: url(../img/bg_sea.png);
-    background-color: #7accc8;
     background-repeat: no-repeat;
     background-size: 100%;
+}
+
+main {
+    color: white;
+}
+
+section {
+    text-align: center;
+}
+
+header {
+    font-size: 32px;
+    width: 100%;
+    margin: 0;
+    letter-spacing: 5px;
+    color: white;
 }
 
 #overlay {
@@ -19,85 +73,9 @@ body {
     z-index: -1;
     top: 0;
     left: 0;
-
     width: 100%;
     height: 100%;
-
     opacity: .78;
-    background-color: #7accc8;
-}
-
-/* -------------------------------------------------------------------------- */
-/* NAVBAR
-/* -------------------------------------------------------------------------- */
-
-.navbar {
-    border: none;
-    background-color: rgba(0, 0, 0, .0);
-}
-
-#logo {
-    max-width: 180px;
-    max-height: 180px;
-}
-
-#user-menu {
-    margin-top: 25px;
-    margin-right: 10px;
-}
-
-.user-btn {
-    width: 80px;
-
-    background-color: white;
-}
-
-a,
-a:hover,
-a:active,
-a:visited {
-    color: #7accc8;
-}
-
-/* -------------------------------------------------------------------------- */
-/* MAIN
-/* -------------------------------------------------------------------------- */
-
-#pg-radius,
-#pg-route {
-    display: none;
-}
-
-span {
-    font-family: Helvetica, sans-serif;
-    font-size: 32px;
-
-    width: 100%;
-    margin: 0;
-
-    text-align: center;
-    letter-spacing: 5px;
-
-    color: white;
-}
-
-.form-group {
-    text-align: center;
-}
-
-.form-actions {
-    margin-top: 10px;
-
-    text-align: center;
-}
-
-.user-input {
-    width: 200px;
-    margin: auto;
-
-    text-align: center;
-
-    color: #7accc8;
 }
 
 #map {

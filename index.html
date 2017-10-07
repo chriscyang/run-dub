@@ -3,94 +3,67 @@
 <html>
 
 <head>
-
     <!-- META -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- ICON -->
+    <link rel="shortcut icon" href="img/favicon.png">
 
     <!-- TITLE -->
     <title>Run DUB</title>
 
-    <!-- ICON -->
-    <link rel="shortcut icon" href="img/icon.png">
-
     <!-- CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
-
-    <!-- COLOUR OVERLAY -->
     <div id="overlay"></div>
 
-    <!-- NAVBAR -->
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
                 <div class="navbar-left">
-                    <a id="logo-link"><img id="logo" alt="Run DUB" src="img/logo.png" /></a>
-                </div>
-            </div>
-            <div id="user-menu" class="nav navbar-nav navbar-right">
-                <div class="btn-group">
-                    <div class="btn btn-default navbar-btn user-btn"><a href="#">Sign Up</a></div>
-                    <div class="btn btn-default navbar-btn user-btn"><a href="#">Sign In</a></div>
+                    <a id="logo">
+                        <img src="img/logo.png" alt="Run DUB" width="180px" height="180px">
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN -->
-    <div class="container">
-
-        <!-- PAGE 1: LOCATION -->
-        <div id="pg-location" class="col-md-8 col-md-offset-2">
-            <span class="col-sm-12">WHERE ARE YOU?</span>
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <input type="text" id="user-loc" class="form-control" />
-                </div>
-                <div class="form-actions">
-                    <div id="enter-loc" class="btn btn-default user-btn user-input"><a href="#">Enter Location</a></div>
-                </div>
-            </form>
-        </div>
-
-        <!-- PAGE 2: RADIUS -->
-        <div id="pg-radius" class="col-md-8 col-md-offset-2">
-            <span class="col-md-12">WHAT'S YOUR RUN RADIUS (M)?</span>
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <input type="text" id="user-rad" class="form-control" />
-                </div>
-                <div class="form-actions">
-                    <div id="lets-move" class="btn btn-default user-btn user-input"><a href="#">Let's Get Moving</a></div>
-                </div>
-            </form>
-        </div>
-
-        <!-- PAGE 3: ROUTE -->
-        <div id="pg-route" class="col-md-8 col-md-offset-2">
-            <span class="col-md-12">HERE'S YOU</span>
-            <div id="map"></div>
-            <div class="form-actions">
-                <div id="new-route" class="btn btn-default user-btn user-input"><a href="#">Give Me Something</a></div>
+    <main class="container">
+        <section data-page="loc" class="page col-md-8 col-md-offset-2">
+            <header class="page-title col-md-12">WHERE ARE YOU?</header>
+            <div class="form-group">
+                <input type="text" class="page-input form-control">
             </div>
-        </div>
-    </div>
+            <button class="page-submit btn btn-default">Enter Location</button>
+        </section>
 
-    <!-- FOOTER -->
-    <nav class="navbar navbar-default navbar-fixed-bottom">
-        <div class="container-fluid"></div>
-    </nav>
+        <section data-page="rad" class="page col-md-8 col-md-offset-2">
+            <header class="page-title col-md-12">WHAT'S YOUR RUN RADIUS (M)?</header>
+            <div class="form-group">
+                <input type="text" class="page-input form-control">
+            </div>
+            <button class="page-submit btn btn-default">Let's Get Moving</button>
+        </section>
+
+        <section data-page="map" class="page col-md-8 col-md-offset-2">
+            <header class="page-title col-md-12">HERE'S YOU...</header>
+            <div class="form-group">
+                <div id="map"></div>
+            </div>
+            <button class="page-submit btn btn-default">Give Me Something</button>
+        </section>
+    </main>
 
     <!-- JS -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDttMI7oQkU7f4oSj9TJxHnK4RMDETzhRI&libraries=places"></script>
     <script src="js/jquery.min.js"></script>
     <script src="js/app.js"></script>
-
 </body>
 
 </html>
