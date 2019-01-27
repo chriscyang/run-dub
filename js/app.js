@@ -51,15 +51,15 @@ const App = (() => {
     pvt.THEMES = Object.freeze({
       [pvt.Page.LOC]: Object.freeze({
         color: "#7accc8",
-        image: "url(img/seattle.png)"
+        image: "url(img/sea.png)"
       }),
       [pvt.Page.RAD]: Object.freeze({
         color: "#fdc689",
-        image: "url(img/san_francisco.png)"
+        image: "url(img/sfo.png)"
       }),
       [pvt.Page.MAP]: Object.freeze({
         color: "#6dcff6",
-        image: "url(img/mountains.png)"
+        image: "url(img/yvr.png)"
       })
     });
 
